@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>خلك سريع</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body{font-family:Tahoma,Arial,sans-serif;background:linear-gradient(135deg,#eef2ff,#f8fafc);padding:20px}
+.card{background:#fff;max-width:650px;margin:auto;padding:20px;border-radius:22px;box-shadow:0 15px 30px rgba(0,0,0,.1)}
+.logo{text-align:center;font-size:34px;font-weight:bold;margin-bottom:10px}
+.teams{display:flex;gap:10px;margin-bottom:10px}
+.team{flex:1;background:#f1f5f9;border-radius:12px;padding:10px;text-align:center;font-weight:bold}
+.active{background:#dbeafe;border:2px solid #2563eb}
+select,input,button{width:100%;padding:10px;margin-top:10px;font-size:16px;border-radius:10px;border:1px solid #ccc}
+button{background:#2563eb;color:#fff;border:none;cursor:pointer}
+.top{display:flex;justify-content:space-between;margin-top:10px;font-weight:bold}
+.question{margin-top:20px;font-size:18px}
+.win{display:none;text-align:center}
+.win h2{font-size:26px;color:#16a34a}
+</style>
+</head>
+<body>
+<div class="card">
+<div class="logo">⚡ خلك سريع</div>
+
+<div class="teams">
+<div class="team active" id="team1">عبقريون ⭐<br>النقاط: <span id="s1">0</span></div>
+<div class="team" id="team2">مفكرون ⭐<br>النقاط: <span id="s2">0</span></div>
+</div>
+
+<select id="level" onchange="setLevel()">
+<option value="10">سهل ⏱️ 10 ثواني</option>
+<option value="7">متوسط ⏱️ 7 ثواني</option>
+<option value="5">صعب ⏱️ 5 ثواني</option>
+</select>
+
+<select id="letter" onchange="resetGame()"></select>
+
+<div class="top">
+<div>⏱️ <span id="time">10</span></div>
+<div>الدور: <span id="turn">الأول</span></div>
+</div>
+
+<div class="question" id="question"></div>
+<input id="answer" placeholder="اكتب الإجابة">
+<button onclick="submitAnswer()">إرسال</button>
+
+<div class="win" id="win">
+<h2 id="winner"></h2>
+<button onclick="resetGame()">🔄 لعب مرة أخرى</button>
+</div>
+</div>
+
+<script>
+const questions=["اسم نبي","دولة","رياضة","شهر هجري","حيوان","شيء يومي","صفة جميلة","كتاب إسلامي","أكلة","صحابي"];
+const letters="ابتثجحخدذرزسشصضطظعغفقكلمنهوي".split("");
+const letterSel=document.getElementById("letter");
+letters.forEach(l=>{let o=document.createElement("option");o.value=l;o.textContent="حرف "+l;letterSel.appendChild(o)});
+
+let q=0,team=1,s1=0,s2=0,time=10,limit=10,timer;
+const Q=document.getElementById("question"),A=document.getElementById("answer");
+
+function setLevel(){limit=parseInt(document.getElementById("level").value);resetGame()}
+function startTimer(){clearInterval(timer);time=limit;document.getElementById("time").textContent=time;
+timer=setInterval(()=>{time--;document.getElementById("time").textContent=time;if(time===0)next(false)},1000)}
+function submitAnswer(){const v=A.value.trim();if(v&&v.startsWith(letterSel.value))next(true);else next(false)}
+function next(ok){clearInterval(timer);if(ok){team===1?s1++:s2++;document.getElementById(team===1?"s1":"s2").textContent=team===1?s1:s2}
+A.value="";team=team===1?2:1;updateTeams();q++;
+if(q<questions.length){Q.textContent=(q+1)+"️⃣ "+questions[q];startTimer()}else showWinner()}
+function updateTeams(){document.getElementById("team1").classList.toggle("active",team===1);
+document.getElementById("team2").classList.toggle("active",team===2);
+document.getElementById("turn").textContent=team===1?"الأول":"الثاني"}
+function showWinner(){document.getElementById("win").style.display="block";
+Q.style.display="none";A.style.display="none";document.querySelector("button").style.display="none";
+let w=s1>s2?"🏆 عبقريون فائز":s2>s1?"🏆 مفكرون فائز":"🤝 تعادل";
+document.getElementById("winner").textContent=w}
+function resetGame(){q=0;team=1;s1=0;s2=0;document.getElementById("s1").textContent=0;document.getElementById("s2").textContent=0;
+document.getElementById("win").style.display="none";Q.style.display="block";A.style.display="block";document.querySelector("button").style.display="block";
+updateTeams();Q.textContent="1️⃣ "+questions[0];startTimer()}
+setLevel();
+</script>
+</body>
+</html>
